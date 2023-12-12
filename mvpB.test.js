@@ -17,21 +17,30 @@ describe('Sprint 7 Challenge Learner Tests', () => {
 
   /*
   👉 TASK 2 - Integration Testing of HelloWorld component at the bottom of this module
-
-  Test the <HelloWorld /> component found below...
-    - using `screen.queryByText` to capture nodes
-    - using `toBeInTheDocument` to assert their existence in the DOM
-
-    [1] renders a link that reads "Home"
-    [2] renders a link that reads "About"
-    [3] renders a link that reads "Blog"
-    [4] renders a text that reads "The Truth"
-    [5] renders a text that reads "JavaScript is pretty awesome"
-    [6] renders a text that includes "javaScript is pretty" (use exact = false)
   */
-  //test('you can comment out this test', () => {
-  //  expect(true).toBe(false)
-  //})
+  describe('Hello World integration tests', () => {
+    ["Home", "About", "Blog"].map(linkText => {
+      test(`renders a link that reads "${linkText}"`, () => {
+        render(HelloWorld())
+        expect(screen.queryByText(linkText, {selector: 'a'})).toBeInTheDocument()
+      })
+    })
+    test('renders a h2 that reads "The Truth"', () => {
+      render(HelloWorld())
+      const text = 'The Truth'
+      expect(screen.queryByText(text, {selector: 'h2'})).toBeInTheDocument()
+    })
+    test('renders a p that reads "JavaScript is pretty awesome"', () => {
+      render(HelloWorld())
+      const text = "JavaScript is pretty awesome"
+      expect(screen.queryByText(text, {selector: 'p'})).toBeInTheDocument()
+    })
+    test('renders a text that includes "javaScript is pretty"', () => {
+      render(HelloWorld())
+      const text = "javaScript is pretty"
+      expect(screen.queryByText(text, {exact: false})).toBeInTheDocument()
+    })
+  })
 })
 
 function sum(a, b) {
