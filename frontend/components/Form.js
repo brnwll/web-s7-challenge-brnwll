@@ -19,6 +19,21 @@ const toppings = [
 ]
 
 export default function Form() {
+  const initialFormValues = { fullName: '', size: '', toppings: [], }
+  const [formValues, setFormValues] = useState(initialFormValues)
+
+  // Sample payload: delete this comment later
+  // { "fullName": "Jane Doe", "size": "L", "toppings": ["1","2","3","4","5"] }
+
+  const onChange = (e) => {
+    const { name, value } = e.target
+    const getUpdatedToppingsArray = () => formValues.toppings.includes(value)
+      ? formValues.toppings.filter(topping => topping !== value)
+      : formValues.toppings.concat(value)
+    const newValue = name === 'toppings' ? getUpdatedToppingsArray() : value;
+    setFormValues({ ...formValues, [name]: newValue})
+  }
+
   return (
     <form>
       <h2>Order Your Pizza</h2>
@@ -28,7 +43,13 @@ export default function Form() {
       <div className="input-group">
         <div>
           <label htmlFor="fullName">Full Name</label><br />
-          <input placeholder="Type full name" id="fullName" type="text" />
+          <input 
+            name="fullName" 
+            type="text"
+            placeholder="Type full name" 
+            id="fullName" 
+            onChange={onChange} value={formValues.fullName}
+          />
         </div>
         {true && <div className='error'>Bad value</div>}
       </div>
@@ -36,23 +57,32 @@ export default function Form() {
       <div className="input-group">
         <div>
           <label htmlFor="size">Size</label><br />
-          <select id="size">
+          <select 
+            id="size" 
+            name="size" 
+            value={formValues.size}
+            onChange={onChange}>
             <option value="">----Choose Size----</option>
-            {/* Fill out the missing options */}
+            <option value="Small">Small</option>
+            <option value="Medium">Medium</option>
+            <option value="Large">Large</option>
           </select>
         </div>
         {true && <div className='error'>Bad value</div>}
       </div>
-
       <div className="input-group">
-        {/* 👇 Maybe you could generate the checkboxes dynamically */}
-        <label key="1">
+      {toppings.map(({topping_id, text}) => (
+        <label key={topping_id}>
           <input
-            name="Pepperoni"
             type="checkbox"
+            name='toppings'
+            value={topping_id}
+            onChange={onChange}
+            checked={formValues.toppings.includes(topping_id)}
           />
-          Pepperoni<br />
+          {text}<br />
         </label>
+      ))}
       </div>
       {/* 👇 Make sure the submit stays disabled until the form validates! */}
       <input type="submit" />
