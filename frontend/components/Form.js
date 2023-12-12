@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+
+
 
 // 👇 Here are the validation errors you will use with Yup.
 const validationErrors = {
@@ -20,10 +23,10 @@ const toppings = [
 
 export default function Form() {
   const initialFormValues = { fullName: '', size: '', toppings: [], }
+  const initialPostResponseValues = { success: '', error: '' }
+  const [formDisabled, setFormDisabled] = useState(true)
   const [formValues, setFormValues] = useState(initialFormValues)
-
-  // Sample payload: delete this comment later
-  // { "fullName": "Jane Doe", "size": "L", "toppings": ["1","2","3","4","5"] }
+  const [postResponse, setPostResponse] = useState(initialPostResponseValues)
 
   const onChange = (e) => {
     const { name, value } = e.target
@@ -34,11 +37,29 @@ export default function Form() {
     setFormValues({ ...formValues, [name]: newValue})
   }
 
+  const onSubmit = (e) => {
+    e.preventDefault()
+    setFormDisabled(true)
+
+    // format size for the endpoint (S, M, L)
+    const formattedValues = { ...formValues, size: formValues.size[0]}
+
+    axios.post('http://localhost:9009/api/order', formattedValues)
+      .then(({data: { message }}) => {
+        setPostResponse({ initialPostResponseValues, success: message })
+        setFormValues(initialFormValues)
+      })
+      .catch(({response: {data: {message}}}) => {
+        setPostResponse({ initialPostResponseValues, error: message })
+        setFormDisabled(false)
+      })
+  }
+
   return (
-    <form>
+    <form onSubmit={onSubmit}>
       <h2>Order Your Pizza</h2>
-      {true && <div className='success'>Thank you for your order!</div>}
-      {true && <div className='failure'>Something went wrong</div>}
+      {postResponse.success && <div className='success'>{postResponse.success}</div>}
+      {postResponse.error && <div className='failure'>{postResponse.error}</div>}
 
       <div className="input-group">
         <div>
@@ -85,7 +106,7 @@ export default function Form() {
       ))}
       </div>
       {/* 👇 Make sure the submit stays disabled until the form validates! */}
-      <input type="submit" />
+      <input type="submit" disabled={formDisabled} />
     </form>
   )
 }
