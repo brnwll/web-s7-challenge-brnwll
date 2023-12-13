@@ -25,7 +25,7 @@ const schema = yup.object().shape({
     .max(20, validationErrors.fullNameTooLong),
   size: yup.string().trim().required()
     .oneOf(['S', 'M', 'L'], validationErrors.sizeIncorrect),
-  toppings: yup.array().min(0).max(toppings.length),
+  toppings: yup.array().optional()
 })
 
 export default function Form() {
@@ -45,11 +45,11 @@ export default function Form() {
 
   const onChange = (e) => {
     const { name, value } = e.target
-    validate(name, value)
     const getUpdatedToppingsArray = () => formValues.toppings.includes(value)
       ? formValues.toppings.filter(topping => topping !== value)
       : formValues.toppings.concat(value)
     const newValue = name === 'toppings' ? getUpdatedToppingsArray() : value;
+    validate(name, newValue)
     setFormValues({ ...formValues, [name]: newValue})
   }
 
